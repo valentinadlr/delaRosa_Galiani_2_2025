@@ -1,6 +1,6 @@
 # Creación de Repositorio Compartido
 
-A continuación se detallan los pasos para la creación de un repositorio compartido para el desarrollo del Proyecto Integrador. Este proceso lo debe uno de los miembros del grupo, quien se encargara de la creación del repositorio, para luego agregar al otro miembro del grupo como colaborador.
+A continuación se detallan los pasos para la creación de un repositorio compartido para el desarrollo del Proyecto Integrador. Este proceso lo debe realizar uno de los miembros del grupo, quien se encargara de la creación del repositorio, para luego agregar al otro miembro del grupo como colaborador.
 
 ## Creación de Repositorio
 
