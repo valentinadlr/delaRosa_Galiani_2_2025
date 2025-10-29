@@ -33,7 +33,7 @@
 #include <stdint.h>
 
 #define VASO_UMBRAL_CM 5
-#define SEGUNDOS_ENTRE_DESCARGAS 1800   // 30 minutos
+#define SEGUNDOS_ENTRE_DESCARGAS 5   // 30 minutos
 #define TIEMPO_REFRESCO_CONTADOR 1      // 1 segundo
 
 static uint32_t contador_segundos = 0;
@@ -60,11 +60,12 @@ void TareaPrincipal(void *pvParameters) {
             printf("⏰ Tiempo cumplido — revisando vaso...\n");
 
             uint16_t distancia = HcSr04ReadDistanceInCentimeters();
-            if (distancia < VASO_UMBRAL_CM) {
-                NeoPixelSetColor(GREEN);
+            if (distancia <= VASO_UMBRAL_CM) {
+                printf("verde");
+                // NeoPixelSetColor(GREEN);
                 DispensarAgua();
             } else {
-                NeoPixelSetColor(RED);
+                // NeoPixelSetColor(RED);
                 printf("⚠ No hay vaso — no se dispensa\n");
             }
         }
@@ -92,7 +93,7 @@ void TareaTeclas(void *pvParameters) {
             contador_segundos = 0;
         }
 
-        DelayMs(200); // antirrebote
+        DelayMs(200); // antirrebote ?
     }
 }
 
@@ -102,7 +103,7 @@ void app_main(void) {
     // Inicialización de periféricos
     HcSr04Init(GPIO_3, GPIO_2); // echo, trigger
     SwitchesInit();
-    NeoPixelInit();
+    // NeoPixelInit();
 
     // Crear tareas
     xTaskCreate(TareaPrincipal, "TareaPrincipal", 2048, NULL, 1, NULL);
