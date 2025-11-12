@@ -42,7 +42,7 @@
 #define NEOPIXEL_PIN GPIO_18 //pin neopixel
 #define NEOPIXEL_LEN 12
 #define VASO_UMBRAL_CM 5
-#define SEGUNDOS_ENTRE_DESCARGAS 5 // 30 minutos
+#define SEGUNDOS_ENTRE_DESCARGAS 20 // 30 minutos
 #define TIEMPO_REFRESCO_CONTADOR 1 // 1 segundo
 
 static neopixel_color_t colores[NEOPIXEL_LEN];
@@ -64,8 +64,9 @@ void DispensarAgua(void)
 {
     printf("💧 DISPENSANDO AGUA\n");
     BombaOn();
-    DelaySec(3);
     NeoPixelAllColor(NEOPIXEL_COLOR_CYAN);
+    DelaySec(25); // tiempo que dispensa el agua
+    NeoPixelAllColor(NEOPIXEL_COLOR_ROSE);
     BombaOff();
 }
 
@@ -98,7 +99,7 @@ void TareaPrincipal(void *pvParameters)
                 printf("⚠ No hay vaso — no se dispensa\n");
             }
         }
-
+        printf("%lu\n", contador_segundos);
         DelaySec(TIEMPO_REFRESCO_CONTADOR); // cada 1 segundo
     }
 }
@@ -120,13 +121,13 @@ void TareaTeclas(void *pvParameters)
             contador_segundos = SEGUNDOS_ENTRE_DESCARGAS; // fuerza evento
         }
 
-        if (estado & SWITCH_2)
+        else if (estado & SWITCH_2)
         {
             printf("🔘 Tecla 2 presionada — reiniciar contador\n");
             contador_segundos = 0;
         }
 
-        DelayMs(200); // antirrebote ?
+        DelayMs(200); 
     }
 }
 
