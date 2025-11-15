@@ -15,7 +15,8 @@
  * |  NeoPixel      |   GPIO_8          |
  * |  Switch 1      |   GPIO_4          |
  * |  Switch 2      |   GPIO_15         |
- * |  Rele (Bomba)  |   GPIO_16          |
+ * |  Rele (Bomba)  |   GPIO_16         |
+ * |  Buffer        |   GPIO_17         |
  *
  *
  * @section changelog Changelog
@@ -24,7 +25,7 @@
  * |:----------:|:-----------------------------------------------|
  * | 12/09/2023 | Document creation		                         |
  *
- * @author Albano Peñalva (albano.penalva@uner.edu.ar)
+ * @author Valentina de la Rosa y Fiorella Galiani (valentina.delarosa@ingenieria.uner.edu.ar) (fiorella.galiani@ingenieria.uner.edu.ar)
  *
  */
 
@@ -39,9 +40,11 @@
 #include "gpio_mcu.h"
 #include "uart_mcu.h"
 #include "esp_log.h"
+#include "buzzer.h"
+#include "buzzer_melodies.h"
 
-#define RELE_PIN GPIO_19     // pin para el relé
-#define NEOPIXEL_PIN GPIO_18 // pin neopixel
+#define RELE_PIN GPIO_19     
+#define NEOPIXEL_PIN GPIO_18 
 #define NEOPIXEL_LEN 12
 #define VASO_UMBRAL_CM 5
 #define SEGUNDOS_ENTRE_DESCARGAS 1800 // 30 minutos
@@ -58,7 +61,7 @@ int putchar(int c) {
 
 void BombaOn(void)
 {
-    GPIOState(RELE_PIN, false); // activa el relé
+    GPIOState(RELE_PIN, false);
     printf("💡 Bomba encendida\n");
 }
 
@@ -88,7 +91,6 @@ void TareaPrincipal(void *pvParameters)
     {
         contador_segundos++;
 
-        // Verificar si se alcanzó el tiempo de dispensado
         if (contador_segundos >= SEGUNDOS_ENTRE_DESCARGAS)
         {
             contador_segundos = 0;
@@ -105,10 +107,11 @@ void TareaPrincipal(void *pvParameters)
             {
                 NeoPixelAllColor(NEOPIXEL_COLOR_RED);
                 printf("⚠ No hay vaso — no se dispensa\n");
+                BuzzerPlayRtttl(songSpiderman);
             }
         }
         printf("%lu\n", contador_segundos);
-        DelaySec(TIEMPO_REFRESCO_CONTADOR); // cada 1 segundo
+        DelaySec(TIEMPO_REFRESCO_CONTADOR); 
     }
 }
 
@@ -128,12 +131,12 @@ void TareaTeclas(void *pvParameters)
         switch (estado)
         {
         case SWITCH_1:
-            // podemos agregar mensaje por la uart
+            printf("Tenemos sed? Esta bien!\n");
             contador_segundos = SEGUNDOS_ENTRE_DESCARGAS;
             break;
 
         case SWITCH_2:
-            // podemos agregar mensaje por la uart
+            printf("Salteamos este ciclo\n");
             contador_segundos = 0;
             break;
 
@@ -151,7 +154,7 @@ int my_vprintf(const char *fmt, va_list args)
     char buffer[256];
     int len = vsnprintf(buffer, sizeof(buffer), fmt, args);
 
-    uart_write_bytes(UART_NUM_0, buffer, len); // UART por USB
+    UartSendBuffer(UART_PC, buffer, len); 
     return len;
 }
 
@@ -174,6 +177,10 @@ void app_main(void)
 
     GPIOInit(RELE_PIN, GPIO_OUTPUT);
     GPIOOn(RELE_PIN);
+
+    BuzzerInit(GPIO_17);
+    BuzzerOn();
+
 
     NeoPixelInit(NEOPIXEL_PIN, NEOPIXEL_LEN, colores);
     NeoPixelBrightness(80);
